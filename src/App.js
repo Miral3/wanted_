@@ -3,6 +3,7 @@ import { ThemeProvider } from 'styled-components';
 import theme from './theme/theme';
 import GlobalStyle from './GlobalStyle';
 import Navbar from './components/Navbar';
+import SlideBanner from './components/SlideBanner';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <Navbar />
+        <SlideBanner />
       </ThemeProvider>
     </div>
   );

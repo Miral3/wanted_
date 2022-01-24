@@ -1,7 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
-  a, body, div, em, h1, h2, h3, h4, h5, h6, img, label, li, span, table, tbody, td, th, thead, tr, ul {
+  a, body, div, em, h1, h2, h3, h4, h5, h6, img, label, li, span, table, tbody, td, th, thead, tr, ul, button {
       margin: 0;
       padding: 0;
       border: 0;
@@ -9,6 +9,9 @@ const GlobalStyle = createGlobalStyle`
   a {
     text-decoration: none;
     color: #333333;
+  }
+  a, button {
+    cursor: pointer;
   }
   * {
     box-sizing: border-box;
