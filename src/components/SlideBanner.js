@@ -41,11 +41,18 @@ const ButtonImg = styled.img`
 
 function SlideBanner() {
   const sliderRef = useRef();
+  const imageCount = data.length;
+
   const [winX, setWinX] = useState(window.innerWidth);
   const [currentIndex, setCurrentIndex] = useState(2);
   const [imageX, setImageX] = useState(1060);
   const [isChange, setIsChange] = useState(true);
-  const imageCount = 13;
+
+  const [isMouseDown, setIsMouseDown] = useState(false);
+  const [isMouseOver, setIsMouseOver] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [dragX, setDragX] = useState(0);
+
 
   const calcPosition = (idx) => {
     if (winX > 1200) {
@@ -60,6 +67,7 @@ function SlideBanner() {
 
   const onClickPrevBtn = () => {
     setIsChange(true);
+    setDragX(0);
     setCurrentIndex(currentIndex - 1);
     if (currentIndex === 1) {
       setTimeout(() => {
@@ -73,6 +81,7 @@ function SlideBanner() {
 
   const onClickNextBtn = () => {
     setIsChange(true);
+    setDragX(0);
     setCurrentIndex(currentIndex + 1);
     if (currentIndex === 11) {
       setTimeout(() => {
@@ -88,6 +97,53 @@ function SlideBanner() {
     setWinX(window.innerWidth);
   }
 
+  const onMouseDownImg = (e) => {
+    setIsMouseDown(true);
+    setStartX(e.pageX - sliderRef.current.offsetLeft);
+  }
+
+  const onMouseUpImg = () => {
+    setIsMouseDown(false);
+
+    if (dragX > 0) {
+      onClickNextBtn();
+    } else if (dragX < 0) {
+      onClickPrevBtn();
+    }
+  }
+
+  const onMouseOverImg = () => {
+    setIsMouseOver(true);
+  }
+
+  const onMouseLeaveImg = () => {
+    setIsMouseDown(false);
+    setIsMouseOver(false);
+
+    if (dragX > 0) {
+      onClickNextBtn();
+    } else if (dragX < 0) {
+      onClickPrevBtn();
+    }
+  }
+
+  const onMouseMoveImg = (e) => {
+    if (!isMouseDown) {
+      return;
+    }
+
+    const x = e.pageX - sliderRef.current.offsetLeft;
+    const walk = (x - startX) * -1;
+    sliderRef.current.style.transform = `translateX(${(calcPosition(currentIndex)) - walk}px)`;
+    sliderRef.current.style.transition = `all 0s ease-in-out`;
+
+    if (Math.abs(walk) >= imageX * 0.2) {
+      setDragX(walk);
+    } else {
+      setDragX(0);
+    }
+  }
+
   useEffect(() => {
     window.addEventListener("resize", resizeWindow);
     return () => {
@@ -97,13 +153,11 @@ function SlideBanner() {
 
   useEffect(() => {
     if (isChange) {
-      sliderRef.current.style.transform = `translateX(${calcPosition(
-        currentIndex
-      )}px)`;
+      sliderRef.current.style.transform = `translateX(${calcPosition(currentIndex)}px)`;
       sliderRef.current.style.transition = `all 0.5s ease-in-out`;
     }
     const intervalId = setInterval(() => {
-      if (!sliderRef.current) {
+      if (!sliderRef.current || isMouseOver) {
         return;
       }
       setIsChange(true);
@@ -118,7 +172,7 @@ function SlideBanner() {
       }
     }, 4000);
     return () => clearTimeout(intervalId);
-  }, [currentIndex, winX, imageX, onClickPrevBtn, onClickNextBtn, calcPosition, isChange]);
+  }, [currentIndex, winX, imageX, isChange, isMouseOver, isMouseDown]);
 
   useEffect(() => {
     if (winX < 1200) {
@@ -128,11 +182,17 @@ function SlideBanner() {
     }
   }, [winX]);
 
-
   return (
     <Wrapper>
       <SlierContainer>
-        <SlierImages ref={sliderRef}>
+        <SlierImages
+          ref={sliderRef}
+          onMouseDown={onMouseDownImg}
+          onMouseUp={onMouseUpImg}
+          onMouseMove={onMouseMoveImg}
+          onMouseOver={onMouseOverImg}
+          onMouseLeave={onMouseLeaveImg}
+        >
           {data.map((item) => {
             return (
               <Slide

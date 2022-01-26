@@ -16,6 +16,7 @@ const Wrapper = styled.div`
 const ImageContainer = styled.div`
   padding: 0 12px;
   box-sizing: content-box;
+  cursor: pointer;
   @media ${({ theme }) => theme.device.md} {
     height: 183px;
     border-radius: 3px 3px 0 0;
